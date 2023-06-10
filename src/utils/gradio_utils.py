@@ -272,38 +272,38 @@ def generate_image_prompts_with_templates(word):
     Returns:
         torch.Tensor: Tensor of image embeddings.
 """
-def make_custom_dir(description, sent_type, api_key, org_key, l_custom_sentences):
-    if sent_type=="fixed-template":
-        l_sentences = generate_image_prompts_with_templates(description)
-    elif "GPT3" in sent_type:
-        import openai
-        openai.organization = org_key
-        openai.api_key = api_key
-        _=openai.Model.retrieve("text-davinci-002")
-        l_sentences = gpt3_compute_word2sentences("object", description, num=1000)
+# def make_custom_dir(description, sent_type, api_key, org_key, l_custom_sentences):
+#     if sent_type=="fixed-template":
+#         l_sentences = generate_image_prompts_with_templates(description)
+#     elif "GPT3" in sent_type:
+#         import openai
+#         openai.organization = org_key
+#         openai.api_key = api_key
+#         _=openai.Model.retrieve("text-davinci-002")
+#         l_sentences = gpt3_compute_word2sentences("object", description, num=1000)
     
-    elif "flan-t5-xl" in sent_type:
-        l_sentences = flant5xl_compute_word2sentences(description, num=1000)
-        # save the sentences to file
-        with open(f"tmp/flant5xl_sentences_{description}.txt", "w") as f:
-            for line in l_sentences:
-                f.write(line+"\n")
-    elif "BLOOMZ-7B" in sent_type:
-        l_sentences = bloomz_compute_sentences(description, num=1000)
-        # save the sentences to file
-        with open(f"tmp/bloomz_sentences_{description}.txt", "w") as f:
-            for line in l_sentences:
-                f.write(line+"\n")
+#     elif "flan-t5-xl" in sent_type:
+#         l_sentences = flant5xl_compute_word2sentences(description, num=1000)
+#         # save the sentences to file
+#         with open(f"tmp/flant5xl_sentences_{description}.txt", "w") as f:
+#             for line in l_sentences:
+#                 f.write(line+"\n")
+#     elif "BLOOMZ-7B" in sent_type:
+#         l_sentences = bloomz_compute_sentences(description, num=1000)
+#         # save the sentences to file
+#         with open(f"tmp/bloomz_sentences_{description}.txt", "w") as f:
+#             for line in l_sentences:
+#                 f.write(line+"\n")
     
-    elif sent_type=="custom sentences":
-        l_sentences = l_custom_sentences.split("\n")
-        print(f"length of new sentence is {len(l_sentences)}")
+#     elif sent_type=="custom sentences":
+#         l_sentences = l_custom_sentences.split("\n")
+#         print(f"length of new sentence is {len(l_sentences)}")
 
-    pipe = EditingPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float32).to("cuda")
-    emb = load_sentence_embeddings(l_sentences, pipe.tokenizer, pipe.text_encoder, device="cuda")
-    del pipe
-    torch.cuda.empty_cache()
-    return emb
+#     pipe = EditingPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float32).to("cuda")
+#     emb = load_sentence_embeddings(l_sentences, pipe.tokenizer, pipe.text_encoder, device="cuda")
+#     del pipe
+#     torch.cuda.empty_cache()
+#     return emb
 
 
 """
@@ -331,7 +331,7 @@ def make_custom_dir(description, sent_type, api_key, org_key, l_custom_sentences
     Returns:
         The edited PIL image resulting from the edit.
 """
-def launch_main(img_in_real, src,dest, num_ddim, xa_guidance, edit_mul, fpath_z_gen):
+def launch_main(img_in_real, src,dest, num_ddim, xa_guidance, edit_mul): # fpath_z_gen):
     d_name2desc = hf_get_all_directions_names()
     d_desc2name = {v:k for k,v in d_name2desc.items()}
     os.makedirs("tmp", exist_ok=True)
