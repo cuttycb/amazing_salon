@@ -399,21 +399,21 @@ def launch_main(img_in_real, src,dest, num_ddim, xa_guidance, edit_mul): # fpath
         else:
             x_inv = torch.load(inv_fname)
 
-        # do the editing
-        edit_pipe = EditingPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float32).to("cuda")
-        edit_pipe.scheduler = DDIMScheduler.from_config(edit_pipe.scheduler.config)
+        # # do the editing
+        # edit_pipe = EditingPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float32).to("cuda")
+        # edit_pipe.scheduler = DDIMScheduler.from_config(edit_pipe.scheduler.config)
 
-        _, edit_pil = edit_pipe(prompt_str,
-                num_inference_steps=num_ddim,
-                x_in=x_inv,
-                edit_dir=text_dir,
-                guidance_amount=xa_guidance,
-                guidance_scale=5.0,
-                negative_prompt=prompt_str # use the unedited prompt for the negative prompt
-        )
-        del edit_pipe
-        torch.cuda.empty_cache()
-        return edit_pil[0]
+        # _, edit_pil = edit_pipe(prompt_str,
+        #         num_inference_steps=num_ddim,
+        #         x_in=x_inv,
+        #         edit_dir=text_dir,
+        #         guidance_amount=xa_guidance,
+        #         guidance_scale=5.0,
+        #         negative_prompt=prompt_str # use the unedited prompt for the negative prompt
+        # )
+        # del edit_pipe
+        # torch.cuda.empty_cache()
+        # return edit_pil[0]
 
 #     elif img_in_real is None and img_in_synth is not None:
 #         print("using synthetic image")
