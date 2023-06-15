@@ -336,27 +336,27 @@ def launch_main(img_in_real, src,dest, num_ddim, xa_guidance, edit_mul): # fpath
     d_desc2name = {v:k for k,v in d_name2desc.items()}
     os.makedirs("tmp", exist_ok=True)
 
-#     # generate custom direction first
-#     if src=="make your own!":
-#         outf_name = f"tmp/template_emb_{src_custom}_{sent_type_src}.pt"
-#         if not os.path.exists(outf_name):
-#             src_emb = make_custom_dir(src_custom, sent_type_src, api_key, org_key, custom_sentences_src)
-#             torch.save(src_emb, outf_name)
-#         else:
-#             src_emb = torch.load(outf_name)
-#     else:
-#         src_emb = hf_get_emb(d_desc2name[src])
+    # generate custom direction first
+    if src=="make your own!":
+        outf_name = f"tmp/template_emb_{src_custom}_{sent_type_src}.pt"
+        if not os.path.exists(outf_name):
+            src_emb = make_custom_dir(src_custom, sent_type_src, api_key, org_key, custom_sentences_src)
+            torch.save(src_emb, outf_name)
+        else:
+            src_emb = torch.load(outf_name)
+    else:
+        src_emb = hf_get_emb(d_desc2name[src])
     
-#     if dest=="make your own!":
-#         outf_name = f"tmp/template_emb_{dest_custom}_{sent_type_dest}.pt"
-#         if not os.path.exists(outf_name):
-#             dest_emb = make_custom_dir(dest_custom, sent_type_dest, api_key, org_key, custom_sentences_dest)
-#             torch.save(dest_emb, outf_name)
-#         else:
-#             dest_emb = torch.load(outf_name)
-#     else:
-#         dest_emb = hf_get_emb(d_desc2name[dest])
-#     text_dir = (dest_emb.cuda() - src_emb.cuda())*edit_mul
+    if dest=="make your own!":
+        outf_name = f"tmp/template_emb_{dest_custom}_{sent_type_dest}.pt"
+        if not os.path.exists(outf_name):
+            dest_emb = make_custom_dir(dest_custom, sent_type_dest, api_key, org_key, custom_sentences_dest)
+            torch.save(dest_emb, outf_name)
+        else:
+            dest_emb = torch.load(outf_name)
+    else:
+        dest_emb = hf_get_emb(d_desc2name[dest])
+    text_dir = (dest_emb.cuda() - src_emb.cuda())*edit_mul
 
     if img_in_real is not None: # and img_in_synth is None:
         print("using real image")
@@ -399,21 +399,21 @@ def launch_main(img_in_real, src,dest, num_ddim, xa_guidance, edit_mul): # fpath
         else:
             x_inv = torch.load(inv_fname)
 
-        # # do the editing
-        # edit_pipe = EditingPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float32).to("cuda")
-        # edit_pipe.scheduler = DDIMScheduler.from_config(edit_pipe.scheduler.config)
+        # do the editing
+        edit_pipe = EditingPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float32).to("cuda")
+        edit_pipe.scheduler = DDIMScheduler.from_config(edit_pipe.scheduler.config)
 
-        # _, edit_pil = edit_pipe(prompt_str,
-        #         num_inference_steps=num_ddim,
-        #         x_in=x_inv,
-        #         edit_dir=text_dir,
-        #         guidance_amount=xa_guidance,
-        #         guidance_scale=5.0,
-        #         negative_prompt=prompt_str # use the unedited prompt for the negative prompt
-        # )
-        # del edit_pipe
-        # torch.cuda.empty_cache()
-        # return edit_pil[0]
+        _, edit_pil = edit_pipe(prompt_str,
+                num_inference_steps=num_ddim,
+                x_in=x_inv,
+                edit_dir=text_dir,
+                guidance_amount=xa_guidance,
+                guidance_scale=5.0,
+                negative_prompt=prompt_str # use the unedited prompt for the negative prompt
+        )
+        del edit_pipe
+        torch.cuda.empty_cache()
+        return edit_pil[0]
 
 #     elif img_in_real is None and img_in_synth is not None:
 #         print("using synthetic image")
