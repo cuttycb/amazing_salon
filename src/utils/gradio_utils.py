@@ -1,3 +1,5 @@
+#gradio_utils
+
 import os, sys, time, re, pdb
 import torch, torchvision
 import numpy
@@ -74,7 +76,7 @@ def launch_generate_sample(prompt, seed, negative_scale, num_ddim):
     z_hashname = hashlib.sha256(z.cpu().numpy().tobytes()).hexdigest()
     z_inv_fname = f"tmp/{z_hashname}_ddim_{num_ddim}_inv.pt"
     torch.save(z, z_inv_fname)
-    rec_pil = edit_pipe(prompt, 
+    rec_pil = edit_pipe(prompt,
         num_inference_steps=num_ddim, x_in=z,
         only_sample=True, # this flag will only generate the sampled image, not the edited image
         guidance_scale=negative_scale,
@@ -112,7 +114,7 @@ def clean_l_sentences(ls):
         list of str: List of generated sentences.
 """
 def gpt3_compute_word2sentences(task_type, word, num=100):
-    l_sentences = [] 
+    l_sentences = []
     if task_type=="object":
         template_prompt = f"Provide many captions for images containing {word}."
     elif task_type=="style":
@@ -127,7 +129,7 @@ def gpt3_compute_word2sentences(task_type, word, num=100):
         for line in raw_return.split("\n"):
             line = line.strip()
             if len(line)>10:
-                skip=False 
+                skip=False
                 for subword in word.split(" "):
                     if subword not in line: skip=True
                 if not skip: l_sentences.append(line)
@@ -209,13 +211,13 @@ def bloomz_compute_sentences(word, num=100):
             continue
         for line in output:
             line = line.strip()
-            skip=False 
+            skip=False
             for subword in word.split(" "):
                 if subword not in line: skip=True
             print(line)
             if not skip: l_sentences.append(line)
             else: l_sentences.append(line+f", {word}")
-            
+
         print(len(l_sentences))
         if len(l_sentences)>=num:
             break
@@ -281,7 +283,7 @@ def generate_image_prompts_with_templates(word):
 #         openai.api_key = api_key
 #         _=openai.Model.retrieve("text-davinci-002")
 #         l_sentences = gpt3_compute_word2sentences("object", description, num=1000)
-    
+
 #     elif "flan-t5-xl" in sent_type:
 #         l_sentences = flant5xl_compute_word2sentences(description, num=1000)
 #         # save the sentences to file
@@ -294,7 +296,7 @@ def generate_image_prompts_with_templates(word):
 #         with open(f"tmp/bloomz_sentences_{description}.txt", "w") as f:
 #             for line in l_sentences:
 #                 f.write(line+"\n")
-    
+
 #     elif sent_type=="custom sentences":
 #         l_sentences = l_custom_sentences.split("\n")
 #         print(f"length of new sentence is {len(l_sentences)}")
@@ -336,26 +338,26 @@ def launch_main(img_in_real, src,dest, num_ddim, xa_guidance, edit_mul): # fpath
     d_desc2name = {v:k for k,v in d_name2desc.items()}
     os.makedirs("tmp", exist_ok=True)
 
-    # generate custom direction first
-    if src=="make your own!":
-        outf_name = f"tmp/template_emb_{src_custom}_{sent_type_src}.pt"
-        if not os.path.exists(outf_name):
-            src_emb = make_custom_dir(src_custom, sent_type_src, api_key, org_key, custom_sentences_src)
-            torch.save(src_emb, outf_name)
-        else:
-            src_emb = torch.load(outf_name)
-    else:
-        src_emb = hf_get_emb(d_desc2name[src])
-    
-    if dest=="make your own!":
-        outf_name = f"tmp/template_emb_{dest_custom}_{sent_type_dest}.pt"
-        if not os.path.exists(outf_name):
-            dest_emb = make_custom_dir(dest_custom, sent_type_dest, api_key, org_key, custom_sentences_dest)
-            torch.save(dest_emb, outf_name)
-        else:
-            dest_emb = torch.load(outf_name)
-    else:
-        dest_emb = hf_get_emb(d_desc2name[dest])
+    # #generate custom direction first
+    # if src=="make your own!":
+    #     outf_name = f"tmp/template_emb_{src_custom}_{sent_type_src}.pt"
+    #     if not os.path.exists(outf_name):
+    #         src_emb = make_custom_dir(src_custom, sent_type_src, api_key, org_key, custom_sentences_src)
+    #         torch.save(src_emb, outf_name)
+    #     else:
+    #         src_emb = torch.load(outf_name)
+    # else:
+    src_emb = hf_get_emb(d_desc2name[src])
+
+    # if dest=="make your own!":
+    #     outf_name = f"tmp/template_emb_{dest_custom}_{sent_type_dest}.pt"
+    #     if not os.path.exists(outf_name):
+    #         dest_emb = make_custom_dir(dest_custom, sent_type_dest, api_key, org_key, custom_sentences_dest)
+    #         torch.save(dest_emb, outf_name)
+    #     else:
+    #         dest_emb = torch.load(outf_name)
+    # else:
+    dest_emb = hf_get_emb(d_desc2name[dest])
     text_dir = (dest_emb.cuda() - src_emb.cuda())*edit_mul
 
     if img_in_real is not None: # and img_in_synth is None:
@@ -383,13 +385,13 @@ def launch_main(img_in_real, src,dest, num_ddim, xa_guidance, edit_mul): # fpath
         else:
             prompt_str = open(caption_fname, "r").read().strip()
         print(f"CAPTION: {prompt_str}")
-        
+
         # do the inversion if it hasn't been done before
         if not os.path.exists(inv_fname):
             # inversion pipeline
             pipe_inv = DDIMInversion.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float32).to("cuda")
             pipe_inv.scheduler = DDIMInverseScheduler.from_config(pipe_inv.scheduler.config)
-            x_inv, x_inv_image, x_dec_img = pipe_inv( prompt_str, 
+            x_inv, x_inv_image, x_dec_img = pipe_inv( prompt_str,
                     guidance_scale=1, num_inversion_steps=num_ddim,
                     img=img_in_real, torch_dtype=torch.float32 )
             x_inv = x_inv.detach()
@@ -445,7 +447,7 @@ def set_visible_false():
 
 CSS_main = """
     body {
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-weight:300;
     font-size:18px;
     margin-left: auto;
@@ -484,7 +486,7 @@ CSS_main = """
     }
 
     .disclaimerbox {
-        background-color: #eee;		
+        background-color: #eee;
         border: 1px solid #eeeeee;
         border-radius: 10px ;
         -moz-border-radius: 10px ;
@@ -655,19 +657,19 @@ CSS_main = """
     /* filter: blur(2px); */
     -webkit-transition : -webkit-filter 250ms linear;
     /* opacity: 0.5; */
-    cursor: pointer; 
+    cursor: pointer;
     }
 
 
 
-    .selected {	
+    .selected {
     /* outline: 100px solid var(--hover-background) !important; */
     /* outline-offset: -100px; */
     filter: grayscale(0%);
     -webkit-transition : -webkit-filter 250ms linear;
     /*opacity: 1.0 !important; */
     }
-    
+
     .galleryImg:hover {
     filter: grayscale(0%);
     -webkit-transition : -webkit-filter 250ms linear;
@@ -684,7 +686,7 @@ CSS_main = """
     display: table;
     clear: both;
     }
-    
+
     /* The expanding image container */
     #gallery {
     position: relative;
@@ -927,10 +929,10 @@ CSS_main = """
         position: absolute;
         left: 50%;
         margin-left: -1.5px;
-    }  
+    }
 
 
-    /* 
+    /*
     -------------------------------------------------
     The editing results shown below inversion results
     -------------------------------------------------
@@ -941,7 +943,7 @@ CSS_main = """
         color: #fff;
         height: 20px;
         margin-left: 20px;
-        position: relative; 
+        position: relative;
         top: 20px;
     }
 
@@ -987,10 +989,10 @@ HTML_header = f"""
     <center>
     <div align=center>
         <p align=left>
-        This is a demo for <span style="font-weight: bold;">pix2pix-zero</span>, a diffusion-based image-to-image approach that allows users to 
+        This is a demo for <span style="font-weight: bold;">pix2pix-zero</span>, a diffusion-based image-to-image approach that allows users to
         specify the edit direction on-the-fly (e.g., cat to dog). Our method can directly use pre-trained text-to-image diffusion models, such as Stable Diffusion, for editing real and synthetic images while preserving the input image's structure. Our method is training-free and prompt-free, as it requires neither manual text prompting for each input image nor costly fine-tuning for each task.
         <br>
-        <span style="font-weight: 800;">TL;DR:</span> <span style=" color: #941120;"> no finetuning</span>  required; <span style=" color: #941120;"> no text input</span> needed; input <span style=" color: #941120;"> structure preserved</span>. 
+        <span style="font-weight: 800;">TL;DR:</span> <span style=" color: #941120;"> no finetuning</span>  required; <span style=" color: #941120;"> no text input</span> needed; input <span style=" color: #941120;"> structure preserved</span>.
         </p>
     </div>
     </center>
