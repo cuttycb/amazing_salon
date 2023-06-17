@@ -11,14 +11,11 @@ import openai
 import gradio as gr
 from diffusers import DDIMScheduler
 
-p = "amazing_salon/src/utils"
-if p not in sys.path:
-    sys.path.append(p)
-from huggingface_utils import *
-from edit_directions import construct_direction
-from edit_pipeline import EditingPipeline
-from ddim_inv import DDIMInversion
-from scheduler import DDIMInverseScheduler
+from src.utils.huggingface_utils import *
+from src.utils.edit_directions import construct_direction
+from src.utils.edit_pipeline import EditingPipeline
+from src.utils.ddim_inv import DDIMInversion
+from src.utils.scheduler import DDIMInverseScheduler
 from lavis.models import load_model_and_preprocess
 from transformers import T5Tokenizer, AutoTokenizer, T5ForConditionalGeneration, BloomForCausalLM
 
