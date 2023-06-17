@@ -969,17 +969,16 @@ CSS_main = """
     }
 """
 
-
 HTML_header = f"""
     <body>
     <center>
-    <span style="font-size:36px">Zero-shot Image-to-Image Translation</span>
+    <span style="font-size:36px">Amazing HairSalon</span>
     <table align=center>
         <tr>
             <td align=center>
                 <center>
-                    <span style="font-size:24px; margin-left: 0px;"><a href='https://pix2pixzero.github.io/'>[Website]</a></span>
-                    <span style="font-size:24px; margin-left: 20px;"><a href='https://github.com/pix2pixzero/pix2pix-zero'>[Code]</a></span>
+                    <span style="font-size:24px; margin-left: 0px;"><a href='https://github.com/pix2pixzero/pix2pix-zero'>[Code for zero]</a></span>
+                    <span style="font-size:24px; margin-left: 20px;"><a href='https://github.com/dobe0715/SDEdit'>[Code for SDEdit]</a></span>
                 </center>
             </td>
         </tr>
@@ -989,14 +988,18 @@ HTML_header = f"""
     <center>
     <div align=center>
         <p align=left>
-        This is a demo for <span style="font-weight: bold;">pix2pix-zero</span>, a diffusion-based image-to-image approach that allows users to
-        specify the edit direction on-the-fly (e.g., cat to dog). Our method can directly use pre-trained text-to-image diffusion models, such as Stable Diffusion, for editing real and synthetic images while preserving the input image's structure. Our method is training-free and prompt-free, as it requires neither manual text prompting for each input image nor costly fine-tuning for each task.
+        This is a demo for <span style="font-weight: bold;">pix2pix-zero and SDEdit</span>, pix2pix-zero is a diffusion-based image-to-image approach that allows users to
+        specify the edit direction on-the-fly (e.g.,longhair to shorthair). Our method can directly use pre-trained text-to-image diffusion models, such as Stable Diffusion, for editing real and synthetic images while preserving the input image's structure. Our method is training-free and prompt-free, as it requires neither manual text prompting for each input image nor costly fine-tuning for each task.
+        SDEdit is also diffusion based image-to-image that allow users to drow what they want. If the user want to change a small part(e.g. highlights) of the hair I recommend SDEdit. 
         <br>
         <span style="font-weight: 800;">TL;DR:</span> <span style=" color: #941120;"> no finetuning</span>  required; <span style=" color: #941120;"> no text input</span> needed; input <span style=" color: #941120;"> structure preserved</span>.
         </p>
     </div>
     </center>
 
+
+    <hr>
+    </body>
 
     <hr>
     </body>
