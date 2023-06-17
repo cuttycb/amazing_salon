@@ -11,7 +11,7 @@ import openai
 import gradio as gr
 from diffusers import DDIMScheduler
 
-p = "src/utils"
+p = "amazing_salon/src/utils"
 if p not in sys.path:
     sys.path.append(p)
 from huggingface_utils import *
