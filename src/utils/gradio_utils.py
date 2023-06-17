@@ -989,7 +989,6 @@ HTML_header = f"""
         specify the edit direction on-the-fly (e.g.,longhair to shorthair). Our method can directly use pre-trained text-to-image diffusion models, such as Stable Diffusion, for editing real and synthetic images while preserving the input image's structure. Our method is training-free and prompt-free, as it requires neither manual text prompting for each input image nor costly fine-tuning for each task.
         SDEdit is also diffusion based image-to-image that allow users to drow what they want. If the user want to change a small part(e.g. highlights) of the hair I recommend SDEdit. 
         <br>
-        <span style="font-weight: 800;">TL;DR:</span> <span style=" color: #941120;"> no finetuning</span>  required; <span style=" color: #941120;"> no text input</span> needed; input <span style=" color: #941120;"> structure preserved</span>.
         </p>
     </div>
     </center>
