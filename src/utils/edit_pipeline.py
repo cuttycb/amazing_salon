@@ -4,9 +4,9 @@ import numpy as np
 import torch
 from typing import Any, Callable, Dict, List, Optional, Union
 from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
-sys.path.insert(0, "src/utils")
-from base_pipeline import BasePipeline
-from cross_attention import prep_unet
+# sys.path.insert(0, "src/utils")
+from src.utils.base_pipeline import BasePipeline
+from src.uitls.cross_attention import prep_unet
 
 
 if torch.cuda.is_available():
